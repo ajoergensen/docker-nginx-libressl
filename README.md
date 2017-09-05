@@ -1,5 +1,9 @@
 #  **[nginx][3]** built with **[LibreSSL][4]**
 
+This repository was originally forked from https://github.com/nginx-modules/docker-nginx-libressl
+
+Most of the build process has been reused from their image.
+
 ## Features
 
 - Uses [Alpine Linux][5] as base
