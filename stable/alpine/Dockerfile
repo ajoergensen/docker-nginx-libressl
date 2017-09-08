@@ -1,4 +1,4 @@
-FROM ajoergensen/baseimage-alpine
+FROM alpine:3.6
 
 MAINTAINER ajoergensen
 
@@ -59,6 +59,7 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	" \
 	&& addgroup -S nginx \
 	&& adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx nginx \
+	&& apk upgrade --no-cache \
 	&& apk add --no-cache --virtual .build-deps \
 		autoconf \
 		automake \
@@ -167,7 +168,7 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 			| sort -u \
 			| xargs -r apk info --installed \
 			| sort -u \
-	) sed tzdata ca-certificates" \
+	) sed tzdata ca-certificates tini shadow" \
 	&& apk add --no-cache --virtual .nginx-rundeps $runDeps \
 	&& apk del .build-deps \
 	&& apk del .gettext \
@@ -176,13 +177,10 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	# forward request and error logs to docker log collector
 	&& ln -sf /dev/stdout /var/log/nginx/access.log \
 	&& ln -sf /dev/stderr /var/log/nginx/error.log \
+	&& mkdir -p /var/www \
 	&& rm -rf /tmp/* /usr/src/* /var/cache/apk/* /root/.gnupg
 
 ADD root/ /
-
-RUN \
-	chmod -v +x /etc/cont-init.d/*.sh /etc/services.d/*/run && \
-	mkdir /var/www
 
 LABEL description="nginx built from source" \
       openssl="LibreSSL $LIBRESSL_VERSION" \
@@ -190,3 +188,6 @@ LABEL description="nginx built from source" \
 
 EXPOSE 80 443
 VOLUME /var/www
+
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["/app/start.sh" ]

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euf -o pipefail
 
 for i in stable mainline
  do
