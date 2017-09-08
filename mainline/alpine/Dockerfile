@@ -1,4 +1,4 @@
-FROM ajoergensen/baseimage-alpine
+FROM alpine:3.6
 
 MAINTAINER ajoergensen
 
@@ -59,6 +59,7 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	" \
 	&& addgroup -S nginx \
 	&& adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx nginx \
+	&& apk upgrade --no-cache \
 	&& apk add --no-cache --virtual .build-deps \
 		autoconf \
 		automake \
@@ -89,7 +90,6 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 		su-exec \
 		tar \
 		tzdata \
-		wget \
 		zlib \
 		zlib-dev \
 	\
@@ -127,7 +127,7 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	\
 	&& tar -zxC /usr/src -f nginx.tar.gz \
 	&& cd /usr/src/nginx-$NGINX_VERSION \
-	&& wget -q https://raw.githubusercontent.com/cujanovic/nginx-dynamic-tls-records-patch/master/nginx__dynamic_tls_records_1.13.0%2B.patch -O dynamic_tls_records.patch \
+	&& curl -fSL https://cdn.rawgit.com/nginx-modules/ngx_http_tls_dyn_size/0.1/nginx-dyntls-1.11.5.diff -o dynamic_tls_records.patch \
 	&& patch -p1 < dynamic_tls_records.patch \
 	&& ./configure $CONFIG --with-debug \
 	&& make -j$(getconf _NPROCESSORS_ONLN) \
@@ -168,7 +168,7 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 			| sort -u \
 			| xargs -r apk info --installed \
 			| sort -u \
-	) sed tzdata ca-certificates" \
+	) sed tzdata ca-certificates tini shadow" \
 	&& apk add --no-cache --virtual .nginx-rundeps $runDeps \
 	&& apk del .build-deps \
 	&& apk del .gettext \
@@ -177,13 +177,10 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	# forward request and error logs to docker log collector
 	&& ln -sf /dev/stdout /var/log/nginx/access.log \
 	&& ln -sf /dev/stderr /var/log/nginx/error.log \
+	&& mkdir -p /var/www \
 	&& rm -rf /tmp/* /usr/src/* /var/cache/apk/* /root/.gnupg
 
 ADD root/ /
-
-RUN \
-        chmod -v +x /etc/cont-init.d/*.sh /etc/services.d/*/run && \
-        mkdir /var/www
 
 LABEL description="nginx built from source" \
       openssl="LibreSSL $LIBRESSL_VERSION" \
@@ -191,3 +188,6 @@ LABEL description="nginx built from source" \
 
 EXPOSE 80 443
 VOLUME /var/www
+
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["/app/start.sh" ]
