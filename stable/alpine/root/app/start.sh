@@ -1,5 +1,4 @@
 #!/bin/sh
-set -x
 
 : ${PUID:=911}
 : ${PGID:=911}
