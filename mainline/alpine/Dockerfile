@@ -84,6 +84,7 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 		libxslt-dev \
 		linux-headers \
 		make \
+		patch \
 		pcre \
 		pcre-dev \
 		perl-dev \
@@ -127,8 +128,8 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	\
 	&& tar -zxC /usr/src -f nginx.tar.gz \
 	&& cd /usr/src/nginx-$NGINX_VERSION \
-	&& curl -fSL https://raw.githubusercontent.com/cujanovic/nginx-dynamic-tls-records-patch/master/nginx__dynamic_tls_records_1.13.0%2B.patch -o dynamic_tls_records.patch \
-	&& patch -p1 < dynamic_tls_records.patch \
+	&& curl -fSL https://gist.githubusercontent.com/SoftCreatR/b5047bda93e10ef048c7f7d4ffba3ec6/raw/d1e25c13769631303a651a8a8b08aa91befd73d5/nginx_1.13.5_sslconfig_combined.patch -o sslconfig.patch \
+	&& patch -p1 < sslconfig.patch \
 	&& ./configure $CONFIG --with-debug \
 	&& make -j$(getconf _NPROCESSORS_ONLN) \
 	&& mv objs/nginx objs/nginx-debug \
@@ -178,7 +179,7 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	&& ln -sf /dev/stdout /var/log/nginx/access.log \
 	&& ln -sf /dev/stderr /var/log/nginx/error.log \
 	&& mkdir -p /var/www \
-	&& rm -rf /tmp/* /usr/src/* /var/cache/apk/* /root/.gnupg
+	&& rm -rf /tmp/* /usr/src/* /var/cache/apk/* /root/.gnupg || true
 
 ADD root/ /
 
