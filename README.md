@@ -10,10 +10,11 @@ Most of the build process has been reused from their image.
 - PCRE with JIT enabled
 - HTTP/2.0 (+NPN) support
 - Async I/O using threads support
-- Dynamic TLS records patch support (and configured) - From [Cloudflare][6]
-- [Brotli][7] compression support (and configured)
-
-Currently the HPACK patch from Cloudflare is not used because it does not apply cleanly against mainline.
+- [Cloudflare Dynamic TLS records][6] patch 
+- [Cloudflare HTTP/2 HPACK][10] patch
+- [Cloudflare SPDY][11] patch (support for SPDY 3.1 as well as HTTP/2)
+- [Brotli][7] compression support
+- [ngx_headers_more][12] module from [OpenResty][13]
 
 ## Usage
 
@@ -46,3 +47,7 @@ Originally based on the official nginx Dockerfile & `Wonderfall/boring-nginx` - 
 [7]: https://en.wikipedia.org/wiki/Brotli
 [8]: https://github.com/jwilder/nginx-proxy
 [9]: https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion
+[10]: https://blog.cloudflare.com/hpack-the-silent-killer-feature-of-http-2/
+[11]: https://github.com/cloudflare/sslconfig/
+[12]: https://github.com/openresty/headers-more-nginx-module
+[13]: https://openresty.org/en/
