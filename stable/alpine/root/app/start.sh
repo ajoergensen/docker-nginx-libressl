@@ -5,20 +5,20 @@
 
 if [ ! -z "$PUID" ]
  then
-        if [ ! "$(id -u nginx)" -eq "$PUID" ]; then usermod -o -u "$PUID" nginx ; fi
+        if [ ! "$(id -u app)" -eq "$PUID" ]; then usermod -o -u "$PUID" app ; fi
 fi
 
 if [ ! -z "$PGID" ]
  then
-        if [ ! "$(id -g nginx)" -eq "$PGID" ]; then groupmod -o -g "$PGID" nginx ; fi
+        if [ ! "$(id -g app)" -eq "$PGID" ]; then groupmod -o -g "$PGID" app ; fi
 fi
 
 echo "
 -----------------------------------
 GID/UID
 -----------------------------------
-User uid:    $(id -u nginx)
-User gid:    $(id -g nginx)
+User uid:    $(id -u app)
+User gid:    $(id -g app)
 -----------------------------------
 "
 
@@ -41,10 +41,10 @@ fi
 
 if [[ $CHOWN_WWWDIR == "TRUE" ]]
  then
-	chown -R nginx:nginx /var/www
+	chown -R app:app /var/www
 fi
 
 # Make sure the app user is able to write to nginx directories
-chown -R nginx:nginx /var/log/nginx /var/cache/nginx 
+chown -R app:app /var/log/nginx /var/cache/nginx 
 
 exec nginx -g 'daemon off;'
