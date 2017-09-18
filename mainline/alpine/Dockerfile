@@ -57,8 +57,8 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 		--add-dynamic-module=/usr/src/ngx_headers_more \
 		--add-dynamic-module=/usr/src/ngx_brotli \
 	" \
-	&& addgroup -S nginx \
-	&& adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx nginx \
+	&& addgroup -S -g 911 nginx \
+	&& adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx -s 911 nginx \
 	&& apk upgrade --no-cache \
 	&& apk add --no-cache --virtual .build-deps \
 		autoconf \
